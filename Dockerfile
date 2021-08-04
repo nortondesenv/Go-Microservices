@@ -20,8 +20,10 @@ WORKDIR /dist
 RUN cp /build/service .
 
 # Build a small image
-FROM scratch
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
 
+COPY . .
 COPY --from=builder /dist/service /
 
 EXPOSE 5555
