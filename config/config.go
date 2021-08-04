@@ -44,8 +44,8 @@ type Jaeger struct {
 
 func exportConfig() error {
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./config")
-	viper.SetConfigName("config.yaml")
+	viper.AddConfigPath("../config")
+	viper.SetConfigName("./config.yaml")
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
