@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/AleksK1NG/products-microservice/pkg/jaeger"
+	"github.com/nortondesenv/Go-Microservice/pkg/jaeger"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/opentracing/opentracing-go"
 
