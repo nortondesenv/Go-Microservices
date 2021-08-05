@@ -22,6 +22,7 @@ import (
 
 	"github.com/nortondesenv/Go-Microservice/config"
 	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
+	"github.com/nortondesenv/Go-Microservice/internal/product/interceptors"
 	"github.com/nortondesenv/Go-Microservice/internal/product/repository"
 	"github.com/nortondesenv/Go-Microservice/internal/product/usecase"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
@@ -53,6 +54,8 @@ func (s *server) Run() error {
 	productMongoRepo := repository.NewProductMongoRepo(s.mongoDB)
 	productUC := usecase.NewProductUC(productMongoRepo, s.log)
 
+	im := interceptors.NewInterceptorManager(s.log, s.cfg)
+
 	port := os.Getenv(PORT)
 	if port == "" {
 		port = s.cfg.Server.Port
@@ -75,6 +78,7 @@ func (s *server) Run() error {
 			grpc_opentracing.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
+			im.Logger,
 		),
 	)
 
