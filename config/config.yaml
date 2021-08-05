@@ -29,3 +29,8 @@ MongoDB:
   User: "admin"
   Password: "admin"
   DB: "products"
+
+Kafka:
+  Broker1: "localhost:9091"
+  Broker2: "localhost:9092"
+  Broker3: "localhost:9093"

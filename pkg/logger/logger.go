@@ -24,6 +24,7 @@ type Logger interface {
 	DPanicf(template string, args ...interface{})
 	Fatal(args ...interface{})
 	Fatalf(template string, args ...interface{})
+	Printf(template string, args ...interface{})
 }
 
 // Logger
@@ -149,4 +150,8 @@ func (l *apiLogger) Fatal(args ...interface{}) {
 
 func (l *apiLogger) Fatalf(template string, args ...interface{}) {
 	l.sugarLogger.Fatalf(template, args...)
+}
+
+func (l *apiLogger) Printf(template string, args ...interface{}) {
+	l.sugarLogger.Infof(template, args...)
 }
