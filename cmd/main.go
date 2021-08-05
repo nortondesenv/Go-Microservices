@@ -55,6 +55,6 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	s := server.NewServer(appLogger, cfg, tracer)
+	s := server.NewServer(appLogger, cfg, tracer, mongoDBConn)
 	appLogger.Fatal(s.Run())
 }
