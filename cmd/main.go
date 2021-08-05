@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/nortondesenv/Go-Microservice/internal/server"
 	"github.com/nortondesenv/Go-Microservice/pkg/jaeger"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
+	"github.com/nortondesenv/Go-Microservice/pkg/mongodb"
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/nortondesenv/Go-Microservice/config"
@@ -13,6 +15,8 @@ import (
 
 func main() {
 	log.Println("Starting service...")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	cfg, err := config.ParseConfig()
 	if err != nil {
@@ -30,6 +34,17 @@ func main() {
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.AppVersion)
 
+	mongoDBConn, err := mongodb.NewMongoDBConn(ctx, cfg)
+	if err != nil {
+		appLogger.Fatal("cannot connect mongodb", err)
+	}
+	defer func() {
+		if err := mongoDBConn.Disconnect(ctx); err != nil {
+			appLogger.Fatal("mongoDBConn.Disconnect", err)
+		}
+	}()
+	appLogger.Infof("MongoDB connected: %v", mongoDBConn.NumberSessionsInProgress())
+
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {
 		appLogger.Fatal("cannot create tracer", err)
@@ -39,18 +54,6 @@ func main() {
 	opentracing.SetGlobalTracer(tracer)
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
-
-	// http.HandleFunc("/api/v1", func(w http.ResponseWriter, r *http.Request) {
-	// 	log.Printf("REQUEST: %v", r.RemoteAddr)
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	w.WriteHeader(http.StatusOK)
-	// 	if err := json.NewEncoder(w).Encode(map[string]string{"message": "ok"}); err != nil {
-	// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 		return
-	// 	}
-	// })
-	//
-	// log.Fatal(http.ListenAndServe(":5000", nil))
 
 	s := server.NewServer(appLogger, cfg, tracer)
 	appLogger.Fatal(s.Run())
