@@ -16,7 +16,7 @@ type Product struct {
 	Name        string             `json:"name" bson:"name,omitempty" validate:"required,min=3,max=250"`
 	Description string             `json:"description" bson:"description,omitempty" validate:"required,min=3,max=500"`
 	Price       float64            `json:"price" bson:"price,omitempty" validate:"required"`
-	ImageURL    string             `json:"imageUrl" bson:"imageUrl,omitempty"`
+	ImageURL    *string            `json:"imageUrl" bson:"imageUrl,omitempty"`
 	Photos      []string           `json:"photos" bson:"photos,omitempty"`
 	Quantity    int64              `json:"quantity" bson:"quantity,omitempty" validate:"required"`
 	Rating      int                `json:"rating" bson:"rating,omitempty" validate:"required,min=0,max=10"`
@@ -24,6 +24,15 @@ type Product struct {
 	UpdatedAt   time.Time          `json:"updatedAt" bson:"updatedAt,omitempty"`
 }
 
+func (p *Product) GetImage() string {
+	var img string
+	if p.ImageURL != nil {
+		img = *p.ImageURL
+	}
+	return img
+}
+
+// ProductFromProto Get Product from proto
 func (p *Product) ToProto() *productsServicePB.Product {
 	return &productsServicePB.Product{
 		ProductID:   p.ProductID.String(),
@@ -31,11 +40,37 @@ func (p *Product) ToProto() *productsServicePB.Product {
 		Name:        p.Name,
 		Description: p.Description,
 		Price:       p.Price,
-		ImageURL:    p.ImageURL,
+		ImageURL:    p.GetImage(),
 		Photos:      p.Photos,
 		Quantity:    p.Quantity,
 		Rating:      int64(p.Rating),
 		CreatedAt:   timestamppb.New(p.CreatedAt),
 		UpdatedAt:   timestamppb.New(p.UpdatedAt),
 	}
+}
+
+// ProductFromProto Get Product from proto
+func ProductFromProto(product *productsServicePB.Product) (*Product, error) {
+	prodID, err := primitive.ObjectIDFromHex(product.GetCategoryID())
+	if err != nil {
+		return nil, err
+	}
+	catID, err := primitive.ObjectIDFromHex(product.GetCategoryID())
+	if err != nil {
+		return nil, err
+	}
+
+	return &Product{
+		ProductID:   prodID,
+		CategoryID:  catID,
+		Name:        product.GetName(),
+		Description: product.GetDescription(),
+		Price:       product.GetPrice(),
+		ImageURL:    &product.ImageURL,
+		Photos:      product.GetPhotos(),
+		Quantity:    product.GetQuantity(),
+		Rating:      int(product.GetRating()),
+		CreatedAt:   product.GetCreatedAt().AsTime(),
+		UpdatedAt:   product.GetUpdatedAt().AsTime(),
+	}, nil
 }
