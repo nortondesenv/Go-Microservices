@@ -11,6 +11,7 @@ import (
 	"github.com/nortondesenv/Go-Microservice/internal/product"
 	grpcErrors "github.com/nortondesenv/Go-Microservice/pkg/grpc_errors"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
+	"github.com/nortondesenv/Go-Microservice/pkg/utils"
 	productsServicePB "github.com/nortondesenv/Go-Microservice/proto/product"
 )
 
@@ -127,7 +128,7 @@ func (p *productService) Search(ctx context.Context, req *productsServicePB.Sear
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productService.Search")
 	defer span.Finish()
 
-	products, err := p.productUC.Search(ctx, req.GetSearch(), req.GetPage(), req.GetSize())
+	products, err := p.productUC.Search(ctx, req.GetSearch(), utils.NewPaginationQuery(int(req.GetSize()), int(req.GetPage())))
 	if err != nil {
 		p.log.Errorf("productUC.Search: %v", err)
 		return nil, grpcErrors.ErrorResponse(err, err.Error())
@@ -135,5 +136,12 @@ func (p *productService) Search(ctx context.Context, req *productsServicePB.Sear
 
 	p.log.Infof("PRODUCTS: %-v", products)
 
-	return nil, nil
+	return &productsServicePB.SearchRes{
+		TotalCount: products.TotalCount,
+		TotalPages: products.TotalPages,
+		Page:       products.Page,
+		Size:       products.Size,
+		HasMore:    products.HasMore,
+		Products:   products.ToProtoList(),
+	}, nil
 }

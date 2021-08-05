@@ -6,6 +6,7 @@ import (
 	"github.com/nortondesenv/Go-Microservice/internal/models"
 	"github.com/nortondesenv/Go-Microservice/internal/product"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
+	"github.com/nortondesenv/Go-Microservice/pkg/utils"
 	"github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -43,8 +44,8 @@ func (p *productUC) GetByID(ctx context.Context, productID primitive.ObjectID) (
 }
 
 // Search Search products
-func (p *productUC) Search(ctx context.Context, search string, page, size int64) ([]*models.Product, error) {
+func (p *productUC) Search(ctx context.Context, search string, pagination *utils.Pagination) (*models.ProductsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productUC.Search")
 	defer span.Finish()
-	return p.productRepo.Search(ctx, search, page, size)
+	return p.productRepo.Search(ctx, search, pagination)
 }
