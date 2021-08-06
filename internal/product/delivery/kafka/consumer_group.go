@@ -2,10 +2,12 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"time"
 
 	"github.com/nortondesenv/Go-Microservice/config"
+	"github.com/nortondesenv/Go-Microservice/internal/models"
 	"github.com/nortondesenv/Go-Microservice/internal/product"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/segmentio/kafka-go"
@@ -158,6 +160,25 @@ func (pcg *ProductsConsumerGroup) consumeUpdateProduct(
 		go pcg.createProductWorker(ctx, cancel, r, w, wg, i)
 	}
 	wg.Wait()
+}
+
+func (pcg *ProductsConsumerGroup) publishErrorMessage(ctx context.Context, w *kafka.Writer, m kafka.Message, err error) error {
+	errMsg := &models.ErrorMessage{
+		Offset:    m.Offset,
+		Error:     err.Error(),
+		Time:      m.Time.UTC(),
+		Partition: m.Partition,
+		Topic:     m.Topic,
+	}
+
+	errMsgBytes, err := json.Marshal(errMsg)
+	if err != nil {
+		return err
+	}
+
+	return w.WriteMessages(ctx, kafka.Message{
+		Value: errMsgBytes,
+	})
 }
 
 func (pcg *ProductsConsumerGroup) RunConsumers(ctx context.Context, cancel context.CancelFunc) {

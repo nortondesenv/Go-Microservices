@@ -28,14 +28,14 @@ func main() {
 	defer w.Close()
 
 	prod := &models.Product{
-		CategoryID: primitive.NewObjectID(),
-		// Name:        "Whey",
-		// Description: "Whey 5kg",
-		// Price:       10.50,
-		// ImageURL:    nil,
-		// Photos:      nil,
-		// Quantity:    1000,
-		// Rating:      10,
+		CategoryID:  primitive.NewObjectID(),
+		Name:        "Microservices",
+		Description: "Microservices Architecture",
+		Price:       10.50,
+		ImageURL:    nil,
+		Photos:      nil,
+		Quantity:    1000,
+		Rating:      10,
 	}
 
 	prodBytes, err := json.Marshal(&prod)

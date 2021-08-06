@@ -51,23 +51,8 @@ func (pcg *ProductsConsumerGroup) createProductWorker(
 
 		created, err := pcg.productsUC.Create(ctx, &prod)
 		if err != nil {
-			errMsg := &models.ErrorMessage{
-				Offset:    m.Offset,
-				Error:     err.Error(),
-				Time:      m.Time.UTC(),
-				Partition: m.Partition,
-				Topic:     m.Topic,
-			}
-
-			errMsgBytes, err := json.Marshal(errMsg)
-			if err != nil {
-				pcg.log.Errorf("productsUC.Create.json.Marsha", err)
-				continue
-			}
-			if err := w.WriteMessages(ctx, kafka.Message{
-				Value: errMsgBytes,
-			}); err != nil {
-				pcg.log.Errorf("productsUC.Create.WriteMessages", err)
+			if err := pcg.publishErrorMessage(ctx, w, m, err); err != nil {
+				pcg.log.Errorf("productsUC.Create.publishErrorMessage", err)
 				continue
 			}
 		}
@@ -120,33 +105,17 @@ func (pcg *ProductsConsumerGroup) updateProductWorker(
 		}
 
 		updated, err := pcg.productsUC.Update(ctx, &prod)
-		errMsg := &models.ErrorMessage{
-			Offset:    m.Offset,
-			Error:     err.Error(),
-			Time:      m.Time.UTC(),
-			Partition: m.Partition,
-			Topic:     m.Topic,
-		}
-
-		errMsgBytes, err := json.Marshal(errMsg)
 		if err != nil {
-			pcg.log.Errorf("productsUC.Update.json.Marsha", err)
-			continue
+			if err := pcg.publishErrorMessage(ctx, w, m, err); err != nil {
+				pcg.log.Errorf("productsUC.Update.publishErrorMessage", err)
+				continue
+			}
 		}
-		if err := w.WriteMessages(ctx, kafka.Message{
-			Topic: deadLetterQueueTopic,
-			Value: errMsgBytes,
-			Time:  m.Time.UTC(),
-		}); err != nil {
-			pcg.log.Errorf("productsUC.Update.WriteMessages", err)
-			continue
-		}
-
 		if err := r.CommitMessages(ctx, m); err != nil {
 			pcg.log.Errorf("FetchMessage", err)
 			continue
 		}
 
-		pcg.log.Infof("Created product: %v", updated)
+		pcg.log.Infof("Update product: %v", updated)
 	}
 }
