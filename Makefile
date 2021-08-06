@@ -66,4 +66,12 @@ clean:
 	docker system prune -f
 
 logs-local:
-	docker logs -f $(FILES) 
+	docker logs -f $(FILES)
+
+
+# ==============================================================================
+# Make local SSL Certificate
+
+make_cert:
+	echo "Generating SSL certificates"
+	cd ./ssl && sh instructions.sh

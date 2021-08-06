@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/nortondesenv/Go-Microservice/internal/models"
@@ -75,8 +74,6 @@ func (p *productMongoRepo) Update(ctx context.Context, product *models.Product) 
 	if err := collection.FindOneAndUpdate(ctx, bson.M{"_id": product.ProductID}, bson.M{"$set": product}, opts).Decode(&prod); err != nil {
 		return nil, errors.Wrap(err, "Decode")
 	}
-
-	log.Printf("UPDATED PRODUCT: %-v", product)
 
 	return &prod, nil
 }
