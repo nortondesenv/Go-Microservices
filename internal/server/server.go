@@ -25,8 +25,8 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/nortondesenv/Go-Microservice/config"
+	"github.com/nortondesenv/Go-Microservice/internal/interceptors"
 	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
-	"github.com/nortondesenv/Go-Microservice/internal/product/interceptors"
 	"github.com/nortondesenv/Go-Microservice/internal/product/repository"
 	"github.com/nortondesenv/Go-Microservice/internal/product/usecase"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
