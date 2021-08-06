@@ -28,6 +28,7 @@ func NewProductService(log logger.Logger, productUC product.UseCase, validate *v
 	return &productService{log: log, productUC: productUC, validate: validate}
 }
 
+// Create insert new product
 func (p *productService) Create(ctx context.Context, req *productsServicePB.CreateReq) (*productsServicePB.CreateRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productService.Create")
 	defer span.Finish()
@@ -61,6 +62,8 @@ func (p *productService) Create(ctx context.Context, req *productsServicePB.Crea
 	successMessages.Inc()
 	return &productsServicePB.CreateRes{Product: created.ToProto()}, nil
 }
+
+// Update alter product
 func (p *productService) Update(ctx context.Context, req *productsServicePB.UpdateReq) (*productsServicePB.UpdateRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productService.Update")
 	defer span.Finish()
