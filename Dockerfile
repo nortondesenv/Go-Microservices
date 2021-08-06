@@ -1,7 +1,6 @@
-FROM golang:1.15-alpine AS builder
+FROM golang:1.16-alpine AS builder
 
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
+ENV CGO_ENABLED=0 \
     GOOS=linux \
     GOARCH=amd64
 
