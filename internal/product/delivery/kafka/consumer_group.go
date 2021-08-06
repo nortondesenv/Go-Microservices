@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"sync"
-	"time"
 
 	"github.com/nortondesenv/Go-Microservice/config"
 	"github.com/nortondesenv/Go-Microservice/internal/models"
@@ -12,29 +11,6 @@ import (
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/compress"
-)
-
-const (
-	minBytes               = 10e3 // 10KB
-	maxBytes               = 10e6 // 10MB
-	queueCapacity          = 100
-	heartbeatInterval      = 3 * time.Second
-	commitInterval         = 0
-	partitionWatchInterval = 5 * time.Second
-	maxAttempts            = 3
-	dialTimeout            = 3 * time.Minute
-
-	writerReadTimeout  = 10 * time.Second
-	writerWriteTimeout = 10 * time.Second
-
-	deadLetterQueueTopic = "dead-letter-queue"
-
-	createProductTopic   = "create-product"
-	createProductWorkers = 16
-	updateProductTopic   = "update-product"
-	updateProductWorkers = 16
-
-	productsGroupID = "products_group"
 )
 
 // ProductsConsumerGroup struct

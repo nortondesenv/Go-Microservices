@@ -42,9 +42,11 @@ func (pcg *ProductsConsumerGroup) createProductWorker(
 			string(m.Key),
 			string(m.Value),
 		)
+		incomingMessages.Inc()
 
 		var prod models.Product
 		if err := json.Unmarshal(m.Value, &prod); err != nil {
+			errorMessages.Inc()
 			pcg.log.Errorf("json.Unmarshal", err)
 			continue
 		}
@@ -52,16 +54,19 @@ func (pcg *ProductsConsumerGroup) createProductWorker(
 		created, err := pcg.productsUC.Create(ctx, &prod)
 		if err != nil {
 			if err := pcg.publishErrorMessage(ctx, w, m, err); err != nil {
+				errorMessages.Inc()
 				pcg.log.Errorf("productsUC.Create.publishErrorMessage", err)
 				continue
 			}
 		}
 
 		if err := r.CommitMessages(ctx, m); err != nil {
+			errorMessages.Inc()
 			pcg.log.Errorf("FetchMessage", err)
 			continue
 		}
 
+		successMessages.Inc()
 		pcg.log.Infof("Created product: %v", created)
 	}
 }
@@ -97,9 +102,11 @@ func (pcg *ProductsConsumerGroup) updateProductWorker(
 			string(m.Key),
 			string(m.Value),
 		)
+		incomingMessages.Inc()
 
 		var prod models.Product
 		if err := json.Unmarshal(m.Value, &prod); err != nil {
+			errorMessages.Inc()
 			pcg.log.Errorf("json.Unmarshal", err)
 			continue
 		}
@@ -107,15 +114,18 @@ func (pcg *ProductsConsumerGroup) updateProductWorker(
 		updated, err := pcg.productsUC.Update(ctx, &prod)
 		if err != nil {
 			if err := pcg.publishErrorMessage(ctx, w, m, err); err != nil {
+				errorMessages.Inc()
 				pcg.log.Errorf("productsUC.Update.publishErrorMessage", err)
 				continue
 			}
 		}
 		if err := r.CommitMessages(ctx, m); err != nil {
+			errorMessages.Inc()
 			pcg.log.Errorf("FetchMessage", err)
 			continue
 		}
 
+		successMessages.Inc()
 		pcg.log.Infof("Update product: %v", updated)
 	}
 }
