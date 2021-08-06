@@ -6,6 +6,7 @@ import (
 
 	"github.com/nortondesenv/Go-Microservice/internal/server"
 	"github.com/nortondesenv/Go-Microservice/pkg/jaeger"
+	"github.com/nortondesenv/Go-Microservice/pkg/kafka"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/nortondesenv/Go-Microservice/pkg/mongodb"
 	"github.com/opentracing/opentracing-go"
@@ -44,6 +45,17 @@ func main() {
 		}
 	}()
 	appLogger.Infof("MongoDB connected: %v", mongoDBConn.NumberSessionsInProgress())
+
+	conn, err := kafka.NewKafkaConn(cfg)
+	if err != nil {
+		appLogger.Fatal("NewKafkaConn", err)
+	}
+	defer conn.Close()
+	brokers, err := conn.Brokers()
+	if err != nil {
+		appLogger.Fatal("conn.Brokers", err)
+	}
+	appLogger.Infof("Kafka connected: %v", brokers)
 
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {
