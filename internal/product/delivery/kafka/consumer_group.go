@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"sync"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/nortondesenv/Go-Microservice/config"
 	"github.com/nortondesenv/Go-Microservice/internal/models"
 	"github.com/nortondesenv/Go-Microservice/internal/product"
@@ -20,18 +21,26 @@ type ProductsConsumerGroup struct {
 	log        logger.Logger
 	cfg        *config.Config
 	productsUC product.UseCase
+	validate   *validator.Validate
 }
 
 // NewProductsConsumerGroup constructor
 func NewProductsConsumerGroup(
 	brokers []string,
 	groupID string,
-	topic string,
 	log logger.Logger,
 	cfg *config.Config,
 	productsUC product.UseCase,
+	validate *validator.Validate,
 ) *ProductsConsumerGroup {
-	return &ProductsConsumerGroup{Brokers: brokers, GroupID: groupID, log: log, cfg: cfg, productsUC: productsUC}
+	return &ProductsConsumerGroup{
+		Brokers:    brokers,
+		GroupID:    groupID,
+		log:        log,
+		cfg:        cfg,
+		productsUC: productsUC,
+		validate:   validate,
+	}
 }
 
 func (pcg *ProductsConsumerGroup) getNewKafkaReader(kafkaURL []string, topic, groupID string) *kafka.Reader {

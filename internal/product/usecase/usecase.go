@@ -9,7 +9,6 @@ import (
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/nortondesenv/Go-Microservice/pkg/utils"
 	"github.com/opentracing/opentracing-go"
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,11 +29,6 @@ func (p *productUC) Create(ctx context.Context, product *models.Product) (*model
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productUC.Create")
 	defer span.Finish()
 
-	if err := p.validate.StructCtx(ctx, product); err != nil {
-		p.log.Errorf("validate.StructCtx: %v", err)
-		return nil, errors.Wrap(err, "validate")
-	}
-
 	return p.productRepo.Create(ctx, product)
 }
 
@@ -42,11 +36,6 @@ func (p *productUC) Create(ctx context.Context, product *models.Product) (*model
 func (p *productUC) Update(ctx context.Context, product *models.Product) (*models.Product, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "productUC.Update")
 	defer span.Finish()
-
-	if err := p.validate.StructCtx(ctx, product); err != nil {
-		p.log.Errorf("validate.StructCtx: %v", err)
-		return nil, errors.Wrap(err, "validate")
-	}
 
 	return p.productRepo.Update(ctx, product)
 }
