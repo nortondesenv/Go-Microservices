@@ -16,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nortondesenv/Go-Microservice/config"
 	"github.com/nortondesenv/Go-Microservice/internal/interceptors"
+	"github.com/nortondesenv/Go-Microservice/internal/middlewares"
 	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
 	productsHttpV1 "github.com/nortondesenv/Go-Microservice/internal/product/delivery/http/v1"
 	"github.com/nortondesenv/Go-Microservice/internal/product/delivery/kafka"
@@ -68,6 +69,7 @@ func (s *server) Run() error {
 	productUC := usecase.NewProductUC(productMongoRepo, s.log, validate)
 
 	im := interceptors.NewInterceptorManager(s.log, s.cfg)
+	mw := middlewares.NewMiddlewareManager(s.log, s.cfg)
 
 	port := os.Getenv(PORT)
 	if port == "" {
@@ -107,7 +109,9 @@ func (s *server) Run() error {
 	grpc_prometheus.Register(grpcServer)
 
 	v1 := s.echo.Group("/api/v1")
-	productHandlers := productsHttpV1.NewProductHandlers(s.log, productUC, validate, v1.Group("/products"))
+	v1.Use(mw.Metrics)
+
+	productHandlers := productsHttpV1.NewProductHandlers(s.log, productUC, validate, v1.Group("/products"), mw)
 	productHandlers.MapRoutes()
 
 	productsCG := kafka.NewProductsConsumerGroup(s.cfg.Kafka.Brokers, "products_group", s.log, s.cfg, productUC, validate)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/nortondesenv/Go-Microservice/internal/middlewares"
 	"github.com/nortondesenv/Go-Microservice/internal/models"
 	"github.com/nortondesenv/Go-Microservice/internal/product"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
@@ -21,11 +22,18 @@ type productHandlers struct {
 	productUC product.UseCase
 	validate  *validator.Validate
 	group     *echo.Group
+	mw        middlewares.MiddlewareManager
 }
 
 // NewProductHandlers constructor
-func NewProductHandlers(log logger.Logger, productUC product.UseCase, validate *validator.Validate, group *echo.Group) *productHandlers {
-	return &productHandlers{log: log, productUC: productUC, validate: validate, group: group}
+func NewProductHandlers(
+	log logger.Logger,
+	productUC product.UseCase,
+	validate *validator.Validate,
+	group *echo.Group,
+	mw middlewares.MiddlewareManager,
+) *productHandlers {
+	return &productHandlers{log: log, productUC: productUC, validate: validate, group: group, mw: mw}
 }
 
 // CreateProduct Create product
