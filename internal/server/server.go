@@ -14,6 +14,15 @@ import (
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/labstack/echo/v4"
+	"github.com/nortondesenv/Go-Microservice/config"
+	"github.com/nortondesenv/Go-Microservice/internal/interceptors"
+	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
+	v12 "github.com/nortondesenv/Go-Microservice/internal/product/delivery/http/v1"
+	"github.com/nortondesenv/Go-Microservice/internal/product/delivery/kafka"
+	"github.com/nortondesenv/Go-Microservice/internal/product/repository"
+	"github.com/nortondesenv/Go-Microservice/internal/product/usecase"
+	"github.com/nortondesenv/Go-Microservice/pkg/logger"
+	productsService "github.com/nortondesenv/Go-Microservice/proto/product"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -21,21 +30,17 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
-
-	"github.com/nortondesenv/Go-Microservice/config"
-	"github.com/nortondesenv/Go-Microservice/internal/interceptors"
-	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
-	"github.com/nortondesenv/Go-Microservice/internal/product/delivery/kafka"
-	"github.com/nortondesenv/Go-Microservice/internal/product/repository"
-	"github.com/nortondesenv/Go-Microservice/internal/product/usecase"
-	"github.com/nortondesenv/Go-Microservice/pkg/logger"
-	productsService "github.com/nortondesenv/Go-Microservice/proto/product"
 )
 
 const (
-	PORT     = "PORT"
-	certFile = "ssl/server.crt"
-	keyFile  = "ssl/server.pem"
+	PORT            = "PORT"
+	certFile        = "ssl/server.crt"
+	keyFile         = "ssl/server.pem"
+	maxHeaderBytes  = 1 << 20
+	gzipLevel       = 5
+	stackSize       = 1 << 10 // 1 KB
+	csrfTokenHeader = "X-CSRF-Token"
+	bodyLimit       = "2M"
 )
 
 // server
@@ -44,11 +49,12 @@ type server struct {
 	cfg     *config.Config
 	tracer  opentracing.Tracer
 	mongoDB *mongo.Client
+	echo    *echo.Echo
 }
 
 // NewServer constructor
 func NewServer(log logger.Logger, cfg *config.Config, tracer opentracing.Tracer, mongoDB *mongo.Client) *server {
-	return &server{log: log, cfg: cfg, tracer: tracer, mongoDB: mongoDB}
+	return &server{log: log, cfg: cfg, tracer: tracer, mongoDB: mongoDB, echo: echo.New()}
 }
 
 // Run Start server
@@ -100,6 +106,10 @@ func (s *server) Run() error {
 	productsService.RegisterProductsServiceServer(grpcServer, productService)
 	grpc_prometheus.Register(grpcServer)
 
+	v1 := s.echo.Group("/api/v1")
+	productHandlers := v12.NewProductHandlers(s.log, productUC, validate, v1.Group("/products"))
+	productHandlers.MapRoutes()
+
 	productsCG := kafka.NewProductsConsumerGroup(s.cfg.Kafka.Brokers, "products_group", s.log, s.cfg, productUC, validate)
 	productsCG.RunConsumers(ctx, cancel)
 
@@ -132,9 +142,9 @@ func (s *server) Run() error {
 		s.log.Errorf("ctx.Done: %v", done)
 	}
 
-	// if err := s.echo.Server.Shutdown(ctx); err != nil {
-	// 	return errors.Wrap(err, "echo.Server.Shutdown")
-	// }
+	if err := s.echo.Server.Shutdown(ctx); err != nil {
+		return errors.Wrap(err, "echo.Server.Shutdown")
+	}
 
 	if err := metricsServer.Shutdown(ctx); err != nil {
 		s.log.Errorf("metricsServer.Shutdown: %v", err)

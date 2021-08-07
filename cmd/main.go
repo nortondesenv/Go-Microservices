@@ -14,6 +14,13 @@ import (
 	"github.com/nortondesenv/Go-Microservice/config"
 )
 
+// @title Products microservice
+// @version 1.0
+// @description Products REST API
+// @contact.name Norton Victor
+// @contact.url https://github.com/nortondesenv
+// @contact.email nortonvictor1999@gmail.com
+// @BasePath /api/v1
 func main() {
 	log.Println("Starting service...")
 	ctx, cancel := context.WithCancel(context.Background())

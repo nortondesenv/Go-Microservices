@@ -8,6 +8,15 @@ Server:
   MaxConnectionIdle: 5
   MaxConnectionAge: 5
 
+Http:
+  Port: ":5007"
+  PprofPort: ":8100"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CookieLifeTime: 44640
+  SessionCookieName: "session_token"
+
 Logger:
   DisableCaller: false
   DisableStacktrace: false
@@ -17,7 +26,7 @@ Logger:
 Metrics:
   Port: ":7070"
   Url: 0.0.0.0:7071
-  ServiceName: user_microservice
+  ServiceName: products_microservice
 
 Jaeger:
   Host: localhost:6831
