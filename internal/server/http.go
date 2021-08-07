@@ -7,7 +7,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/nortondesenv/Go-Microservice/docs"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func (s *server) runHttpServer() {
@@ -18,7 +20,6 @@ func (s *server) runHttpServer() {
 	s.mapRoutes()
 
 	go func() {
-		s.log.Infof("Server is listening on PORT: %s", s.cfg.Http.Port)
 		s.echo.Server.ReadTimeout = time.Second * s.cfg.Http.ReadTimeout
 		s.echo.Server.WriteTimeout = time.Second * s.cfg.Http.WriteTimeout
 		s.echo.Server.MaxHeaderBytes = maxHeaderBytes
@@ -29,7 +30,12 @@ func (s *server) runHttpServer() {
 }
 
 func (s *server) mapRoutes() {
-	// s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Title = "Products microservice"
+	docs.SwaggerInfo.Description = "Products REST API microservice."
+	docs.SwaggerInfo.Version = "1.0"
+
+	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 	s.echo.Use(middleware.Logger())
 	s.echo.Pre(middleware.HTTPSRedirect())
 	s.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{

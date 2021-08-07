@@ -17,7 +17,7 @@ import (
 	"github.com/nortondesenv/Go-Microservice/config"
 	"github.com/nortondesenv/Go-Microservice/internal/interceptors"
 	product "github.com/nortondesenv/Go-Microservice/internal/product/delivery/grpc"
-	v12 "github.com/nortondesenv/Go-Microservice/internal/product/delivery/http/v1"
+	productsHttpV1 "github.com/nortondesenv/Go-Microservice/internal/product/delivery/http/v1"
 	"github.com/nortondesenv/Go-Microservice/internal/product/delivery/kafka"
 	"github.com/nortondesenv/Go-Microservice/internal/product/repository"
 	"github.com/nortondesenv/Go-Microservice/internal/product/usecase"
@@ -107,11 +107,16 @@ func (s *server) Run() error {
 	grpc_prometheus.Register(grpcServer)
 
 	v1 := s.echo.Group("/api/v1")
-	productHandlers := v12.NewProductHandlers(s.log, productUC, validate, v1.Group("/products"))
+	productHandlers := productsHttpV1.NewProductHandlers(s.log, productUC, validate, v1.Group("/products"))
 	productHandlers.MapRoutes()
 
 	productsCG := kafka.NewProductsConsumerGroup(s.cfg.Kafka.Brokers, "products_group", s.log, s.cfg, productUC, validate)
 	productsCG.RunConsumers(ctx, cancel)
+
+	go func() {
+		s.log.Infof("Server is listening on PORT: %s", s.cfg.Http.Port)
+		s.runHttpServer()
+	}()
 
 	go func() {
 		s.log.Infof("GRPC Server is listening on port: %s", port)
