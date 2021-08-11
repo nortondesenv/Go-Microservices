@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/nortondesenv/Go-Microservice/internal/models"
 	"github.com/nortondesenv/Go-Microservice/internal/product"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
@@ -16,12 +15,11 @@ import (
 type productUC struct {
 	productRepo product.MongoRepository
 	log         logger.Logger
-	validate    *validator.Validate
 }
 
 // NewProductUC productUC constructor
-func NewProductUC(productRepo product.MongoRepository, log logger.Logger, validate *validator.Validate) *productUC {
-	return &productUC{productRepo: productRepo, log: log, validate: validate}
+func NewProductUC(productRepo product.MongoRepository, log logger.Logger) *productUC {
+	return &productUC{productRepo: productRepo, log: log}
 }
 
 // Create Create new product
