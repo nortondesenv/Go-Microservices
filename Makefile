@@ -1,11 +1,11 @@
 .PHONY:
 
 # ==============================================================================
-# Docker support
+# Docker
 
-local:
-	echo "Starting local docker compose"
-	docker-compose -f docker-compose.local.yml up --build
+develop:
+	echo "Starting develop docker compose"
+	docker-compose -f docker-compose.yml up --build
 
 gen:
 	GO111MODULE=on  swagger generate spec -o ./api/swagger/swagger.yaml --scan-models
