@@ -7,4 +7,5 @@ Dockerfile.dev
 docker-compose.local.yml
 docker-compose.yml
 Makefile
-config/config.yaml 
+config/config.yaml
+README.md 
