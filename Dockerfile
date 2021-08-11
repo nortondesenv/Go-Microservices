@@ -12,19 +12,19 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o service cmd/main.go
+RUN go build -o app cmd/main.go
 
 WORKDIR /dist
 
-RUN cp /build/service .
+RUN cp /build/app .
 
 # Build a small image
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 COPY . .
-COPY --from=builder /dist/service /
+COPY --from=builder /dist/app /
 
 EXPOSE 5555
 
-ENTRYPOINT ["/service"] 
+ENTRYPOINT ["/app"] 

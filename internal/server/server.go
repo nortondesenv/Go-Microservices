@@ -37,7 +37,6 @@ import (
 )
 
 const (
-	PORT            = "PORT"
 	certFile        = "ssl/server.crt"
 	keyFile         = "ssl/server.pem"
 	maxHeaderBytes  = 1 << 20
@@ -77,12 +76,7 @@ func (s *server) Run() error {
 	im := interceptors.NewInterceptorManager(s.log, s.cfg)
 	mw := middlewares.NewMiddlewareManager(s.log, s.cfg)
 
-	port := os.Getenv(PORT)
-	if port == "" {
-		port = s.cfg.Server.Port
-	}
-
-	l, err := net.Listen("tcp", port)
+	l, err := net.Listen("tcp", s.cfg.Server.Port)
 	if err != nil {
 		return errors.Wrap(err, "net.Listen")
 	}
@@ -129,7 +123,7 @@ func (s *server) Run() error {
 	}()
 
 	go func() {
-		s.log.Infof("GRPC Server is listening on port: %s", port)
+		s.log.Infof("GRPC Server is listening on port: %s", s.cfg.Server.Port)
 		s.log.Fatal(grpcServer.Serve(l))
 	}()
 
