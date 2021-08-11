@@ -8,6 +8,7 @@ require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-playground/validator/v10 v10.8.0
+	github.com/go-redis/redis/v8 v8.11.2
 	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0

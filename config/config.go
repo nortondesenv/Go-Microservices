@@ -18,6 +18,7 @@ type Config struct {
 	MongoDB    MongoDB
 	Kafka      Kafka
 	Http       Http
+	Redis      Redis
 }
 
 // Server config
@@ -65,6 +66,7 @@ type Jaeger struct {
 	LogSpans    bool
 }
 
+// MongoDB config
 type MongoDB struct {
 	URI      string
 	User     string
@@ -72,8 +74,22 @@ type MongoDB struct {
 	DB       string
 }
 
+// Kafka config
 type Kafka struct {
 	Brokers []string
+}
+
+// Redis config
+type Redis struct {
+	RedisAddr      string
+	RedisPassword  string
+	RedisDB        string
+	RedisDefaultDB string
+	MinIdleConn    int
+	PoolSize       int
+	PoolTimeout    int
+	Password       string
+	DB             int
 }
 
 func exportConfig() error {

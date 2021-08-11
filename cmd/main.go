@@ -9,6 +9,7 @@ import (
 	"github.com/nortondesenv/Go-Microservice/pkg/kafka"
 	"github.com/nortondesenv/Go-Microservice/pkg/logger"
 	"github.com/nortondesenv/Go-Microservice/pkg/mongodb"
+	"github.com/nortondesenv/Go-Microservice/pkg/redis"
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/nortondesenv/Go-Microservice/config"
@@ -78,6 +79,9 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	s := server.NewServer(appLogger, cfg, tracer, mongoDBConn)
+	redisClient := redis.NewRedisClient(cfg)
+	appLogger.Info("Redis connected")
+
+	s := server.NewServer(appLogger, cfg, tracer, mongoDBConn, redisClient)
 	appLogger.Fatal(s.Run())
 }
