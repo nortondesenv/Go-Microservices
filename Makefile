@@ -11,12 +11,12 @@ gen:
 	GO111MODULE=on  swagger generate spec -o ./api/swagger/swagger.yaml --scan-models
 
 upload:
-	sudo docker build -t nortonvs/go_microservice:latest -f ./Dockerfile .
-	sudo docker push nortonvs/go_microservice:latest
-	#sudo APP_VERSION=latest docker-compose up
+	docker build -t nortonvs/go_microservice:latest -f ./Dockerfile .
+	docker push nortonvs/go_microservice:latest
+	#APP_VERSION=latest docker-compose up
 
 pull:
-	sudo docker pull nortonvs/go_microservice:latest
+	docker pull nortonvs/go_microservice:latest
 
 crate_topics:
 	docker exec -it kafka1 kafka-topics --zookeeper zookeeper:2181 --create --topic create-product --partitions 3 --replication-factor 2
