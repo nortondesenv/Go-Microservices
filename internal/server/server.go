@@ -37,8 +37,8 @@ import (
 )
 
 const (
-	certFile        = "ssl/server.crt"
-	keyFile         = "ssl/server.pem"
+	certFile        = "./ssl/server.crt"
+	keyFile         = "./ssl/server.pem"
 	maxHeaderBytes  = 1 << 20
 	gzipLevel       = 5
 	stackSize       = 1 << 10 // 1 KB

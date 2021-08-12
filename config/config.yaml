@@ -1,4 +1,5 @@
 AppVersion: 1.0.0
+
 Server:
   Port: :5555
   Development: true

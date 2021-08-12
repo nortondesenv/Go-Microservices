@@ -164,7 +164,7 @@ var doc = `{
                 "rating"
             ],
             "properties": {
-                "CategoryId": {
+                "categoryId": {
                     "type": "string"
                 },
                 "createdAt": {

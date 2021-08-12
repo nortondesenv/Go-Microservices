@@ -29,6 +29,8 @@ services:
       - kafka2
       - kafka3
       - zookeeper
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -46,6 +48,8 @@ services:
     volumes:
       - ./data/zookeeper/data:/data
       - ./data/zookeeper/datalog:/datalog
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -67,6 +71,8 @@ services:
       - ./data/kafka1/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -87,6 +93,8 @@ services:
       - ./data/kafka2/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -108,6 +116,8 @@ services:
       - ./data/kafka3/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -123,6 +133,8 @@ services:
       - kafka1
       - kafka2
       - kafka3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -132,6 +144,8 @@ services:
     container_name: user_redis
     ports:
       - "6379:6379"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -149,15 +163,19 @@ services:
       - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
   node_exporter:
     container_name: node_exporter_container
     restart: always
-    image: prom/node-exporter
+    image: quay.io/prometheus/node-exporter:latest
     ports:
       - "9101:9100"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -167,6 +185,8 @@ services:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -185,6 +205,8 @@ services:
       - 14268:14268
       - 14250:14250
       - 9411:9411
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 
@@ -200,6 +222,8 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data_container:/data/db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - products_network
 

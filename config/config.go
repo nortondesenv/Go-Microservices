@@ -99,7 +99,7 @@ type Redis struct {
 
 func exportConfig() error {
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("../config")
+	viper.AddConfigPath("./config")
 	if os.Getenv("MODE") == "DOCKER" {
 		viper.SetConfigName("config-docker.yml")
 	} else {
