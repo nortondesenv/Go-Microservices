@@ -108,7 +108,7 @@ func (pcg *ProductsConsumerGroup) consumeCreateProduct(
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= workersNum; i++ {
 		wg.Add(1)
-		go pcg.updateProductWorker(ctx, cancel, r, w, wg, i)
+		go pcg.createProductWorker(ctx, cancel, r, w, wg, i)
 	}
 	wg.Wait()
 }
@@ -142,7 +142,7 @@ func (pcg *ProductsConsumerGroup) consumeUpdateProduct(
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= workersNum; i++ {
 		wg.Add(1)
-		go pcg.createProductWorker(ctx, cancel, r, w, wg, i)
+		go pcg.updateProductWorker(ctx, cancel, r, w, wg, i)
 	}
 	wg.Wait()
 }

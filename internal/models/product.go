@@ -51,7 +51,7 @@ func (p *Product) ToProto() *productsServicePB.Product {
 
 // ProductFromProto Get Product from proto
 func ProductFromProto(product *productsServicePB.Product) (*Product, error) {
-	prodID, err := primitive.ObjectIDFromHex(product.GetCategoryID())
+	prodID, err := primitive.ObjectIDFromHex(product.GetProductID())
 	if err != nil {
 		return nil, err
 	}

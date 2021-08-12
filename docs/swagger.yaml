@@ -57,6 +57,13 @@ paths:
       consumes:
       - application/json
       description: Create new single product
+      parameters:
+      - description: Add product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
       produces:
       - application/json
       responses:
@@ -93,6 +100,12 @@ paths:
       - application/json
       description: Update single product by id
       parameters:
+      - description: alter product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
       - description: product id
         in: path
         name: product_id

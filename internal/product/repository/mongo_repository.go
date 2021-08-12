@@ -39,6 +39,7 @@ func (p *productMongoRepo) Create(ctx context.Context, product *models.Product) 
 
 	product.CreatedAt = time.Now().UTC()
 	product.UpdatedAt = time.Now().UTC()
+	product.ProductID = primitive.NewObjectID()
 
 	result, err := collection.InsertOne(ctx, product, &options.InsertOneOptions{})
 	if err != nil {

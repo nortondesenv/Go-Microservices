@@ -41,6 +41,7 @@ func NewProductHandlers(
 // @Summary Create new product
 // @Description Create new single product
 // @Accept json
+// @Param product body models.Product true "Add product"
 // @Produce json
 // @Success 201 {object} models.Product
 // @Router /products [post]
@@ -51,6 +52,7 @@ func (p *productHandlers) CreateProduct() echo.HandlerFunc {
 		createRequests.Inc()
 
 		var prod models.Product
+
 		if err := c.Bind(&prod); err != nil {
 			p.log.Errorf("c.Bind: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
@@ -77,6 +79,7 @@ func (p *productHandlers) CreateProduct() echo.HandlerFunc {
 // @Description Update single product by id
 // @Accept json
 // @Produce json
+// @Param product body models.Product true "alter product"
 // @Param product_id path string true "product id"
 // @Success 200 {object} models.Product
 // @Router /products/{product_id} [put]

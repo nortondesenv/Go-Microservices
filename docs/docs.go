@@ -37,6 +37,17 @@ var doc = `{
                     "Products"
                 ],
                 "summary": "Create new product",
+                "parameters": [
+                    {
+                        "description": "Add product",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -134,6 +145,15 @@ var doc = `{
                 ],
                 "summary": "Update single product",
                 "parameters": [
+                    {
+                        "description": "alter product",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    },
                     {
                         "type": "string",
                         "description": "product id",
